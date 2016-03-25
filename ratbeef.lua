@@ -1,1 +1,1 @@
-dofile("core/ratbeef.lua")
+dofile("core/init.lua")

@@ -8,8 +8,8 @@ function luairc:new (...)
   self.socket = nil
 end
 
-function luairc:send (...)
-  return self.socket:send (...)
+function luairc:send (s, ...)
+  return self.socket:send (string.format (...))
 end
 
 function luairc:connect (host, port)
@@ -25,6 +25,21 @@ function luairc:connect (host, port)
   -- Do IRC Stuff here
 end
 
+function luairc:join (channel)
+  self.s:send ("JOIN :")
+end
 
+function luairc:quit (reason)
+  self.s:send ("QUIT :%s", reason)
+end
+
+function luairc:privmsg (target, message)
+  self.s:send ("PRIVMSG %s :%s", target, message)
+end
+
+function luairc:close ()
+  self.s:close ()
+  self.state = "not connected"
+end
 
 return luairc

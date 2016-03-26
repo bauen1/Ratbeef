@@ -1,7 +1,12 @@
-package.path = package.path .. ";./core/?.lua;./core/?" -- FIXME use package.config
+-- This file is full of hacky s**t
+
+package.path = package.path .. ";./core/?.lua;./core/?" -- Hack Nr.1
 local utils = require ("utils")
-_G.class = utils.class
+_G.class = utils.class -- Unclean way Nr.1
 local core = require ("core")
 core = core ()
+package.loaded ["core"] = core -- Hack Nr.2
 
-core:connect ("irc.esper.net", 6667)
+core:loadmodules ()
+--core:connect ("irc.esper.net", 6667)
+--core:start ()

@@ -12,6 +12,8 @@ function luairc:send (s, ...)
   return self.socket:send (string.format (...))
 end
 
+function luairc:raw (...) return self:send (...) end -- Alias for luairc:send
+
 function luairc:connect (host, port)
   local port = port or 6667
 
@@ -35,6 +37,13 @@ end
 
 function luairc:privmsg (target, message)
   self.s:send ("PRIVMSG %s :%s", target, message)
+end
+
+function luairc:msg (...) return self:privmsg (...) end -- Alias for luairc:privmsg
+
+-- Optional
+function luairc:away (reason)
+  self.s:send ("AWAY :%s", reason)
 end
 
 function luairc:close ()

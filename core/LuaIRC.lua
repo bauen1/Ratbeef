@@ -22,7 +22,11 @@ function luairc:connect (host, port)
   assert (s:connect (host,port))
 
   self.socket = s
-  self:send ("")
+  self:send ("PASS %s", "randompasswordhereoractuallynothingquestionmark")
+  -- FIXME: Authenticate with nickserv here?
+  self:send ("NICK Ratbeef")
+  local mask = 0
+  self:send ("USER Ratbeef %i * :%s",mask, "Ratbeefbot")
 
   -- Do IRC Stuff here
 end

@@ -8,12 +8,6 @@ function luairc:new (...)
   self.socket = nil
 end
 
-function luairc:send (s, ...)
-  return self.socket:send (string.format (...))
-end
-
-function luairc:raw (...) return self:send (...) end -- Alias for luairc:send
-
 function luairc:connect (host, port)
   local port = port or 6667
 
@@ -27,9 +21,19 @@ function luairc:connect (host, port)
   self:send ("NICK Ratbeef")
   local mask = 0
   self:send ("USER Ratbeef %i * :%s",mask, "Ratbeefbot")
-
-  -- Do IRC Stuff here
 end
+
+function luairc:listen ()
+  while true do
+    socket.sleep (0.1) -- TODO: Find a good value for this
+  end
+end
+
+function luairc:send (...)
+  return self.socket:send (string.format (...) .. "\n")
+end
+
+function luairc:raw (...) return self:send (...) end -- Alias for luairc:send
 
 function luairc:join (channel)
   self.s:send ("JOIN :")

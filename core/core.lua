@@ -37,6 +37,7 @@ end
 
 function core:start ()
   -- Start listening for messages
+  self.luairc:listen ()
 end
 
 function core:addCommand (name, func, adminonly)

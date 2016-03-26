@@ -45,19 +45,21 @@ function utils.parse (line)
 
   local cmd, other = string.match (other, "^([^%s]*)(.*)$")
 
-  -- other = "arg1 arg2 arg3 ..."
+  return prefix, cmd, table.pack (table.unpack(utils.split (other)))
+end
 
-  for i=0,100 do -- FIXME: This is broken
-    arg, other = string.match (other, "^([^%s]*)(.*)$")
-    if arg and (arg~="") then
-      table.insert (args, arg)
-    end
 
-    if not arg or not other or other=="" or arg=="" then break end
+function utils.split (a)
+  if a == "" then return {} end
+
+  local ret,a,r={},a,""
+  for i=0,100 do
+    r,a=string.match(a, "^([^%s]*) (.*)$")
+    if r=="" then r = a end
+    table.insert(ret,r)
+    if (not a) or (a=="") then break end
   end
-
-
-  return prefix, cmd, table.pack (table.unpack(args))
+  return ret
 end
 
 function utils.printf (...)

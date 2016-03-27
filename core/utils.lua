@@ -16,7 +16,7 @@ function utils.class ()
   return c
 end
 
-function utils.list (directory) -- Hacky pice of sh**
+function utils.list (directory) -- Hacky pice of sh**, if you got a integrated function replace this!
   local f = io.popen (string.format ("ls ./%s", directory or ""))
   local files = {}
 
@@ -48,17 +48,13 @@ function utils.parse (line)
   return prefix, cmd, table.pack (table.unpack(utils.split (other)))
 end
 
-
 function utils.split (a)
-  if a == "" then return {} end
+  local ret = {}
 
-  local ret,a,r={},a,""
-  for i=0,100 do
-    r,a=string.match(a, "^([^%s]*) (.*)$")
-    if r=="" then r = a end
-    table.insert(ret,r)
-    if (not a) or (a=="") then break end
+  for w in string.gmatch (a, "%a+") do
+    table.insert (ret, w)
   end
+
   return ret
 end
 

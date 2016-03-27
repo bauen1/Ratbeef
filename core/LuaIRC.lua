@@ -25,7 +25,17 @@ end
 
 function luairc:listen ()
   while true do
-    socket.sleep (0.1) -- TODO: Find a good value for this
+    local line, err = self.socket:receive ("*l")
+
+    if line then
+      print (line)
+    else
+      if err = "timeout" then
+        socket.sleep (0.1) -- TODO: Find a good value for this
+      elseif err = "closed" then
+        self:close ()
+      end
+    end
   end
 end
 

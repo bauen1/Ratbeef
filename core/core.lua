@@ -6,6 +6,7 @@ local core = class ()
 function core:new ()
   self.luairc = luairc ()
   self.modules = {}
+  self.commands = {}
 end
 
 function core:connect (host, port)
@@ -41,8 +42,8 @@ function core:start ()
 end
 
 function core:addCommand (name, func, adminonly)
-  -- self = core
   print (string.format ("Registered command '%s'", name))
+  assert (not self.commands [name], string.format ("Command %s already registered",name))
 end
 
 function core:respond (msg)

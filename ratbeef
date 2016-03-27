@@ -1,1 +1,2 @@
+echo "Launching Ratbeef the only bot who marries someone!"
 lua ratbeef.lua

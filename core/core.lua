@@ -4,13 +4,18 @@ local luairc = require ("LuaIRC")
 local core = class ()
 
 function core:new ()
-  self.luairc = luairc ()
+  self.luairc = luairc (function (...) return self:listener (...) end)
   self.modules = {}
   self.commands = {}
 end
 
 function core:connect (host, port)
   self.luairc:connect (host, port)
+  self.luairc:join ("#V") -- Best (and dangeroused) channel on irc.esper.net!
+end
+
+function core:listener (...)
+  return print (...)
 end
 
 function core:disconnect ()
@@ -38,7 +43,7 @@ end
 
 function core:start ()
   -- Start listening for messages
-  self.luairc:listen ()
+  self.luairc:start ()
 end
 
 function core:addCommand (name, func, adminonly)

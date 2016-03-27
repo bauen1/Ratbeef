@@ -3,9 +3,10 @@ local utils = require ("utils")
 
 local luairc = class ()
 
-function luairc:new (...)
+function luairc:new (listener, ...)
   self.state = "not connected"
   self.socket = nil
+  self.listener = listener or function () end
 end
 
 function luairc:connect (host, port)
@@ -21,22 +22,30 @@ function luairc:connect (host, port)
   self:send ("NICK Ratbeef")
   local mask = 0
   self:send ("USER Ratbeef %i * :%s",mask, "Ratbeefbot")
+
+
 end
 
 function luairc:listen ()
-  while true do
-    local line, err = self.socket:receive ("*l")
+  local line, err = self.socket:receive ("*l")
 
-    if line then
-      print (line)
-    else
-      if err = "timeout" then
-        socket.sleep (0.1) -- TODO: Find a good value for this
-      elseif err = "closed" then
-        self:close ()
-      end
+  if line then
+    self.listener (line)
+    return line
+  else
+    if err == "timeout" then
+      return nil
+    elseif err == "closed" then
+      self:close ()
     end
   end
+end
+
+function luairc:start ()
+  repeat
+    self:listen ()
+    socket.sleep (0.1) -- TODO: Find a good value for this
+  until (luairc.state == "not connected")
 end
 
 function luairc:send (...)
@@ -46,26 +55,26 @@ end
 function luairc:raw (...) return self:send (...) end -- Alias for luairc:send
 
 function luairc:join (channel)
-  self.s:send ("JOIN :")
+  self:send ("JOIN :%s", channel)
 end
 
 function luairc:quit (reason)
-  self.s:send ("QUIT :%s", reason)
+  self:send ("QUIT :%s", reason)
 end
 
 function luairc:privmsg (target, message)
-  self.s:send ("PRIVMSG %s :%s", target, message)
+  self:send ("PRIVMSG %s :%s", target, message)
 end
 
 function luairc:msg (...) return self:privmsg (...) end -- Alias for luairc:privmsg
 
 -- Optional
 function luairc:away (reason)
-  self.s:send ("AWAY :%s", reason)
+  self:send ("AWAY :%s", reason)
 end
 
 function luairc:close ()
-  self.s:close ()
+  self.socket:close ()
   self.state = "not connected"
 end
 

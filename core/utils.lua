@@ -58,6 +58,11 @@ function utils.split (a)
   return ret
 end
 
+
+function utils.sanitize (s)
+  return string.gsub (s, "\a", "BELL")
+end
+
 function utils.printf (...)
   return print (string.format (...))
 end

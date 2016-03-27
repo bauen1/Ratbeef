@@ -30,7 +30,7 @@ function luairc:listen ()
   local line, err = self.socket:receive ("*l")
 
   if line then
-    self.listener (line)
+    self.listener (utils.parse (line))
     return line
   else
     if err == "timeout" then

@@ -14,8 +14,23 @@ function core:connect (host, port)
   self.luairc:join ("#V") -- Best (and dangeroused) channel on irc.esper.net!
 end
 
-function core:listener (...)
-  return print (...)
+function core:listener (prefix, cmd, args, ...)
+  if cmd == "PRIVMSG" then
+    local command = self.commands [args[1]]
+    if command.adminonly then
+      if prefix == "bauen1" then
+        command.func (table.unpack (args, 2))
+      else
+        self:respond ("Nope.")
+      end
+    else
+      command.func (table.unpack (args, 2))
+    end
+  else
+    -- Something might have to be done here
+  end
+
+  return print (prefix, cmd, args, ...)
 end
 
 function core:disconnect ()
@@ -49,11 +64,19 @@ end
 function core:addCommand (name, func, adminonly)
   print (string.format ("Registered command '%s'", name))
   assert (not self.commands [name], string.format ("Command %s already registered",name))
+  self.commands [name] = {
+    func=func,
+    adminonly=adminonly}
 end
 
 function core:respond (msg)
+  msg = utils.sanitize (msg)
   self.luairc:privmsg ("#V", msg or "nil passed as message to respond!")
-  print (msg)
+  print ("respond: ", msg)
+end
+
+function core:raw (...)
+  return self.luairc:raw (...)
 end
 
 return core

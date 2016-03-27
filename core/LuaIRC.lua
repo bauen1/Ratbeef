@@ -16,6 +16,8 @@ function luairc:connect (host, port)
   s:settimeout (30)
   assert (s:connect (host,port))
 
+  -- FIXME: Maybe add SSL ?
+
   self.socket = s
   self:send ("PASS %s", "randompasswordhereoractuallynothingquestionmark")
   -- FIXME: Authenticate with nickserv here?
@@ -28,7 +30,7 @@ function luairc:connect (host, port)
     if not line then
       socket.sleep (0.1)
     else
-      local s,e = string.find (line, ":End of /MOTD command%.")
+      local s,e = string.find (line, ":End of /MOTD command%.") -- Shameless copied from Numatron
       if s and e then
         break; -- We are initialized
       end

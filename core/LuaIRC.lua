@@ -23,14 +23,29 @@ function luairc:connect (host, port)
   local mask = 0
   self:send ("USER Ratbeef %i * :%s",mask, "Ratbeefbot")
 
-
+  while true do
+    local line = self:listen ()
+    if not line then
+      socket.sleep (0.1)
+    else
+      local s,e = string.find (line, ":End of /MOTD command%.")
+      if s and e then
+        break; -- We are initialized
+      end
+    end
+  end
 end
 
 function luairc:listen ()
   local line, err = self.socket:receive ("*l")
 
   if line then
-    self.listener (utils.parse (line))
+    local prefix, cmd, args = utils.parse (line)
+    if cmd == "PING" then
+      self:send ("PONG :%s", args[1])
+    else
+      self.listener (prefix, cmd, args)
+    end
     return line
   else
     if err == "timeout" then

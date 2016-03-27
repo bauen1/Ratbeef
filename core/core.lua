@@ -1,9 +1,11 @@
 local utils = require ("utils")
 local luairc = require ("LuaIRC")
+local parser = require ("parser")
 
 local core = class ()
 
 function core:new ()
+  self.parser = parser ()
   self.luairc = luairc (function (...) return self:listener (...) end)
   self.modules = {}
   self.commands = {}
@@ -17,14 +19,16 @@ end
 function core:listener (prefix, cmd, args, ...)
   if cmd == "PRIVMSG" then
     local command = self.commands [args[1]]
-    if command.adminonly then
-      if prefix == "bauen1" then
-        command.func (table.unpack (args, 2))
+    if command then
+      if command.adminonly then
+        if prefix == "bauen1" then
+          command.func (table.unpack (args, 2))
+        else
+          self:respond ("Nope.")
+        end
       else
-        self:respond ("Nope.")
+        command.func (table.unpack (args, 2))
       end
-    else
-      command.func (table.unpack (args, 2))
     end
   else
     -- Something might have to be done here

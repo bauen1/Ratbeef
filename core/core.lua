@@ -43,6 +43,7 @@ function core:disconnect ()
 end
 
 function core:loadmodules ()
+  self.oldpath = package.path
   package.path = package.path .. ";./modules/?/?.lua"
   local modules = utils.list ("modules")
 
@@ -52,6 +53,13 @@ function core:loadmodules ()
   end
 
   print (string.format ("%i Modules loaded", #self.modules))
+end
+
+function core:unloadmodules ()
+  package.path = self.oldpath or package.path
+  self.modules = {}
+  self.commands = {}
+  print ("Modules unloaded")
 end
 
 function core:loadmodule (name) -- TODO: pcall everything

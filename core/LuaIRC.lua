@@ -83,6 +83,9 @@ function luairc:privmsg (target, message)
   self:send ("PRIVMSG %s :%s", target, message)
 end
 
+function luairc:say (channel, message) return self:privmsg (channel, message) end
+function luairc:action (channel, message) return self:privmsg (channel, "ACTION " .. message) end
+
 function luairc:msg (...) return self:privmsg (...) end -- Alias for luairc:privmsg
 
 -- Optional

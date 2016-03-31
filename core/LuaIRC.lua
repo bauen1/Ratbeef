@@ -43,6 +43,7 @@ function luairc:listen ()
   local line, err = self.socket:receive ("*l")
 
   if line then
+    print ("<< " .. line)
     local prefix, cmd, args = utils.parse (line)
     if cmd == "PING" then
       self:send ("PONG :%s", args[1])
@@ -73,7 +74,7 @@ end
 
 function luairc:send (str, ...)
   local s = string.format (tostring (str), ...)
-  print ("SOCKET: " .. s)
+  print (">> " .. s)
   socket.sleep (0.1) -- So we dont totaly spam and waste cpu
   return self.socket:send (s .. "\n")
 end

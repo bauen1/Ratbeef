@@ -75,6 +75,7 @@ end
 function luairc:send (str, ...)
   local s = string.format (tostring (str), ...)
   print (">> " .. s)
+  pcall (assert, str:len (str) <= 512, "Warning, sended message exceeds the limit of 512 chars!")
   socket.sleep (0.1) -- So we dont totaly spam and waste cpu
   return self.socket:send (s .. "\n")
 end

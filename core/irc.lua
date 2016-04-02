@@ -1,15 +1,15 @@
 local socket = require ("socket")
 local utils = require ("utils")
 
-local luairc = class ()
+local irc = class ()
 
-function luairc:new (listener, ...)
+function irc:new (listener, ...)
   self.state = "not connected"
   self.socket = nil
   self.listener = listener or function () end
 end
 
-function luairc:connect (host, port, nickname, username, ssl)
+function irc:connect (host, port, nickname, username, ssl)
   local port = port or 6667
 
   local s = socket.tcp ()
@@ -39,7 +39,7 @@ function luairc:connect (host, port, nickname, username, ssl)
   end
 end
 
-function luairc:listen ()
+function irc:listen ()
   local line, err = self.socket:receive ("*l")
 
   if line then
@@ -65,14 +65,14 @@ function luairc:listen ()
   end
 end
 
-function luairc:start ()
+function irc:start ()
   repeat
     self:listen ()
     socket.sleep (0.1) -- TODO: Find a good value for this
-  until (luairc.state == "not connected")
+  until (irc.state == "not connected")
 end
 
-function luairc:send (str, ...)
+function irc:send (str, ...)
   local s = string.format (tostring (str), ...)
   print (">> " .. s)
   pcall (assert, str:len (str) <= 512, "Warning, sended message exceeds the limit of 512 chars!")
@@ -80,33 +80,33 @@ function luairc:send (str, ...)
   return self.socket:send (s .. "\n")
 end
 
-function luairc:raw (...) return self:send (...) end -- Alias for luairc:send
+function irc:raw (...) return self:send (...) end -- Alias for irc:send
 
-function luairc:join (channel)
+function irc:join (channel)
   self:send ("JOIN :%s", channel)
 end
 
-function luairc:quit (reason)
+function irc:quit (reason)
   self:send ("QUIT :%s", reason)
 end
 
-function luairc:privmsg (target, message)
+function irc:privmsg (target, message)
   self:send ("PRIVMSG %s :%s", target, message)
 end
 
-function luairc:say (channel, message) return self:privmsg (channel, message) end
-function luairc:action (channel, message) return self:privmsg (channel, "ACTION " .. message) end
+function irc:say (channel, message) return self:privmsg (channel, message) end
+function irc:action (channel, message) return self:privmsg (channel, "ACTION " .. message) end
 
-function luairc:msg (...) return self:privmsg (...) end -- Alias for luairc:privmsg
+function irc:msg (...) return self:privmsg (...) end -- Alias for irc:privmsg
 
 -- Optional
-function luairc:away (reason)
+function irc:away (reason)
   self:send ("AWAY :%s", reason)
 end
 
-function luairc:close ()
+function irc:close ()
   self.socket:close ()
   self.state = "not connected"
 end
 
-return luairc
+return irc

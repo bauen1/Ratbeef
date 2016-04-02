@@ -1,12 +1,12 @@
 local utils = require ("utils")
-local luairc = require ("LuaIRC")
+local irc = require ("irc")
 local parser = require ("parser")
 
 local core = class ()
 
 function core:new ()
   --self.parser = parser ()
-  self.luairc = luairc (function (...) print (...) return self:listener (...) end)
+  self.irc = irc (function (...) print (...) return self:listener (...) end)
   self.modules = {}
   self.commands = {}
   self.settings = require ("settings")
@@ -15,13 +15,13 @@ function core:new ()
 end
 
 function core:connect ()
-  self.luairc:connect (self.settings.server, self.settings.port,self.settings.nickname,self.settings.username, self.settings.ssl)
+  self.irc:connect (self.settings.server, self.settings.port,self.settings.nickname,self.settings.username, self.settings.ssl)
   for i, v in ipairs (self.settings.connect_commands) do
     self:send (tostring(v))
   end
-  self.luairc:send ("NICK %s", self.settings.nickname)
+  self.irc:send ("NICK %s", self.settings.nickname)
   for i, v in ipairs (self.settings.channels) do
-    self.luairc:join (tostring (v))
+    self.irc:join (tostring (v))
   end
 end
 
@@ -34,8 +34,8 @@ function core:listener (prefix, cmd, args, ...)
       local channel = args[2]
       local caller = prefix
 
-      self.luairc:join (channel)
-      self.luairc:privmsg (channel, "Here I am, '"..prefix.."' called me!")
+      self.irc:join (channel)
+      self.irc:privmsg (channel, "Here I am, '"..prefix.."' called me!")
     end
   else
     -- Something might have to be done here
@@ -71,8 +71,8 @@ function core:on_privmsg (prefix, channel, ...)
 end
 
 function core:disconnect ()
-  self.luairc:quit ()
-  self.luairc:close ()
+  self.irc:quit ()
+  self.irc:close ()
 end
 
 function core:loadmodules ()
@@ -103,7 +103,7 @@ end
 
 function core:start ()
   -- Start listening for messages
-  self.luairc:start ()
+  self.irc:start ()
 end
 
 function core:addCommand (name, func, adminonly)
@@ -118,11 +118,11 @@ end
 
 function core:respond (channel, msg)
   msg = utils.sanitize (msg)
-  self.luairc:privmsg (channel, msg or "nil passed as message to respond!")
+  self.irc:privmsg (channel, msg or "nil passed as message to respond!")
 end
 
 function core:raw (...)
-  return self.luairc:raw (...)
+  return self.irc:raw (...)
 end
 
 function core:send (...) return self:raw (...) end

@@ -65,7 +65,7 @@ function core:on_privmsg (prefix, channel, ...)
         self:respond ("Nope.")
       --end
     else
-      command.func (prefix, channel, ...)
+      command.func (prefix, channel, table.unpack (args, 2))
     end
   end
 end
@@ -96,9 +96,12 @@ function core:unloadmodules ()
 end
 
 function core:loadmodule (name) -- TODO: pcall everything
-  local module = require (name)
-
-  return module
+  local ret = table.pack (pcall (require, name))
+  if ret[1] then
+    return ret[2] or nil
+  else
+    print (string.format ("Failed to load module '%s' an error occoured.\n%s", name, ret[2]))
+  end
 end
 
 function core:start ()

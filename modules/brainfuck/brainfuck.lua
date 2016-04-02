@@ -1,7 +1,7 @@
 local core = require "core"
 
 
-local function bf (cmd, code)
+local function bf (prefix, channel, cmd, code, ...)
   if cmd == "reset" then
 
   elseif cmd == "run" then

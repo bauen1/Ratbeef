@@ -6,7 +6,7 @@ local task = coroutine.create (function ()
 end)
 coroutine.resume (task)
 
-local function eval_lua (arg)
+local function eval_lua (prefix, channel, ...)
   -- TODO: Implement a Sandbox (better than vifinos :P and don't include backdoors)
   local out = coroutine.resume (arg)
   core:respond (out)

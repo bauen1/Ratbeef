@@ -1,7 +1,7 @@
 local core = require ("core")
 
-function raw (...)
-  core.luairc:send (...)
+function raw (prefix, channel, ...)
+  core.luairc:send (table.concat ({...}, " "))
 end
 
 core:addCommand ("raw", raw, true)

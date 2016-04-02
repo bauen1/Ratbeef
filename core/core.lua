@@ -5,8 +5,8 @@ local parser = require ("parser")
 local core = class ()
 
 function core:new ()
-  self.parser = parser ()
-  self.luairc = luairc (function (...) return self:listener (...) end)
+  --self.parser = parser ()
+  self.luairc = luairc (function (...) print (...) return self:listener (...) end)
   self.modules = {}
   self.commands = {}
   self.settings = require ("settings")
@@ -27,7 +27,7 @@ end
 
 function core:listener (prefix, cmd, args, ...)
   if cmd == "PRIVMSG" then
-    self:on_privmsg (prefix, args, ...)
+    self:on_privmsg (prefix, args[1], table.unpack (args, 2))
   elseif cmd == "INVITE" then
     if args[1] and args[2] then
       local me = args[1]
@@ -42,8 +42,13 @@ function core:listener (prefix, cmd, args, ...)
   end
 end
 
-function core:on_privmsg (prefix, args, ...)
-  local pre_cmd, command = args[1], "nil"
+function core:on_privmsg (prefix, channel, ...)
+  local args = table.pack (...)
+
+  local pre_cmd = args[1] or "nil"
+  local command = nil
+  local channel = "#" .. channel
+
   if pre_cmd == self.settings.prefix then
     command = args[2] or "nil"
   elseif pre_cmd:find ("^"..self.settings.prefix) then
@@ -60,7 +65,7 @@ function core:on_privmsg (prefix, args, ...)
         self:respond ("Nope.")
       --end
     else
-      command.func (table.unpack (args, 2))
+      command.func (prefix, channel, ...)
     end
   end
 end
@@ -111,10 +116,9 @@ function core:addCommand (name, func, adminonly)
   }
 end
 
-function core:respond (msg)
+function core:respond (channel, msg)
   msg = utils.sanitize (msg)
-  self.luairc:privmsg ("#V", msg or "nil passed as message to respond!")
-  print ("respond: ", msg)
+  self.luairc:privmsg (channel, msg or "nil passed as message to respond!")
 end
 
 function core:raw (...)

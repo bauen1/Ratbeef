@@ -46,7 +46,7 @@ function luairc:listen ()
     print ("<< " .. line)
     local prefix, cmd, args = utils.parse (line)
     if cmd == "PING" then
-      self:send ("PONG :%s", args[1])
+      self:send (line:gsub ("PING", "PONG"))
     else
       local ret = table.pack (pcall (self.listener, prefix, cmd, args))
       local success = ret[1]

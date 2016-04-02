@@ -8,7 +8,7 @@ core = core ()
 package.loaded ["core"] = core -- Hack Nr.2
 
 core:loadmodules ()
-core:connect ("127.0.0.1", 6667)
-core:start ()
---core:connect ("irc.esper.net", 6667)
+--core:connect ("127.0.0.1", 6667)
 --core:start ()
+core:connect () -- Uses settings.lua
+core:start ()

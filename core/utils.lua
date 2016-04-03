@@ -34,33 +34,50 @@ function utils.list (directory) -- Hacky pice of sh**, if you got a integrated f
 end
 
 function utils.parse (line)
-  -- Example:
-  -- :prefix command arg1 arg2 ...
-  local args,arg = {},""
-  local prefix, other = string.match (line, "^:([^%s]*) (.*)$")
+  local words = utils.split (line)
 
-  if not other then -- if theres no prefix, then other will be nil
-    other = line
+  if words[1]:sub (1,1) == ":" then
+    prefix = table.remove (words, 1)
   end
 
-  local cmd, other = string.match (other, "^([^%s]*)(.*)$")
+  local cmd = table.remove (words, 1)
 
-  return prefix, cmd, table.pack (table.unpack(utils.split (other)))
+  local args, suffix_start = {}, 0
+  for i,v in ipairs (words) do
+    if v:find ("^:") then
+      suffix_start = i
+      break
+    end
+
+    args [i] = v
+  end
+
+  local suffix
+  if suffix_start == 0 then
+    suffix = ""
+  else
+    suffix = table.concat (words, " ", suffix_start)
+  end
+
+  if suffix ~= "" then
+    suffix = string.gsub (suffix, "^:", "")
+  end
+
+  return prefix, cmd, args, suffix
 end
 
 function utils.split (a)
   local ret = {}
 
-  for w in string.gmatch (a, "%a+") do
+  for w in string.gmatch (a, "[^%s]+") do
     table.insert (ret, w)
   end
 
   return ret
 end
 
-
 function utils.sanitize (s)
-  return string.gsub (s, "\a", "BELL")
+  return string.gsub (s or "", "\a", "BELL")
 end
 
 function utils.printf (...)

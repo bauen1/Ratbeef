@@ -44,16 +44,13 @@ function irc:listen ()
 
   if line then
     print ("<< " .. line)
-    local prefix, cmd, args = utils.parse (line)
+    local prefix, cmd, args, suffix = utils.parse (line)
     if cmd == "PING" then
       self:send (line:gsub ("PING", "PONG"))
     else
-      local ret = table.pack (pcall (self.listener, prefix, cmd, args))
-      local success = ret[1]
-      if not success then
-        print ("Error in listener routine!")
-        print (ret[2])
-      end
+      local ret = table.pack (xpcall (self.listener, function (e)
+        return debug.traceback (e)
+      end, prefix, cmd, args, suffix))
     end
     return line
   else
@@ -68,7 +65,7 @@ end
 function irc:start ()
   repeat
     self:listen ()
-    socket.sleep (0.1) -- TODO: Find a good value for this
+    socket.sleep (0.01) -- TODO: Make this multithreaded
   until (irc.state == "not connected")
 end
 

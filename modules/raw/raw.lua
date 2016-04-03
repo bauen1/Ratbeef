@@ -1,7 +1,7 @@
 local core = require ("core")
 
-function raw (prefix, channel, ...)
-  core.irc:send (table.concat ({...}, " "))
+function raw (prefix, channel, suffix)
+  core.irc:send (channel, suffix or "")
 end
 
 core:addCommand ("raw", raw, true)

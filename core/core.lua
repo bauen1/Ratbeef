@@ -6,7 +6,7 @@ local core = class ()
 
 function core:new ()
   --self.parser = parser ()
-  self.irc = irc (function (...) print (...) return self:listener (...) end)
+  self.irc = irc (function (...)return self:listener (...) end)
   self.modules = {}
   self.commands = {}
   self.settings = require ("settings")
@@ -25,47 +25,79 @@ function core:connect ()
   end
 end
 
-function core:listener (prefix, cmd, args, ...)
+function core:listener (prefix, cmd, args, suffix)
   if cmd == "PRIVMSG" then
-    self:on_privmsg (prefix, args[1], table.unpack (args, 2))
+    self:on_privmsg (prefix, args, suffix)
   elseif cmd == "INVITE" then
-    if args[1] and args[2] then
+    --[[if args[1] and args[2] then
       local me = args[1]
       local channel = args[2]
       local caller = prefix
 
       self.irc:join (channel)
       self.irc:privmsg (channel, "Here I am, '"..prefix.."' called me!")
+    end]]
+  elseif cmd == "KICK" then
+    local channel = args[1]
+    local nickname = args[2]
+    local reason = args[3]
+
+    if nickname == self.settings.nickname then -- FIXME, Nickname can change!
+      self.irc:join ("#" .. channel)
+      self.irc:privmsg ("#" .. channel, "I'm alive ! I'm alive!")
     end
   else
     -- Something might have to be done here
   end
 end
 
-function core:on_privmsg (prefix, channel, ...)
-  local args = table.pack (...)
+function core:on_privmsg (prefix, args, suffix)
+  local channel = table.remove (args, 1)
+  --[[local msgtargettype = "user"
 
-  local pre_cmd = args[1] or "nil"
-  local command = nil
-  local channel = "#" .. channel
+  -- No more args
+  if string.find (msgtarget, "!") then
+    msgtargettype = "user"
+  else
+    msgtargettype = "channel"
+    msgtarget = "#" .. msgtarget
+  end]]
 
-  if pre_cmd == self.settings.prefix then
-    command = args[2] or "nil"
-  elseif pre_cmd:find ("^"..self.settings.prefix) then
-    local _, e = pre_cmd:sub (pre_cmd:find ("^"..self.settings.prefix))
-    command = pre_cmd:sub (e+1)
-  end
+  local prefixLen = string.len (self.settings.prefix)
 
-  local command = self.commands [command]
-  if command then
-    if command.adminonly then
-      --[[if prefix == "bauen1" then
-        command.func (table.unpack (args, 2))
-      else]]
-        self:respond ("Nope.")
-      --end
+  print (string.sub (suffix, 1, prefixLen) == self.settings.prefix)
+  if string.sub (suffix, 1, prefixLen) == self.settings.prefix then
+    suffix = string.sub (suffix, prefixLen+1, -1)
+    local tokens = utils.split (suffix)
+    print (tokens[1], tokens[2], tokens[3])
+    local command = self.commands [table.remove (tokens, 1)]
+    if command then
+      if command.adminonly then
+--[[
+
+<< whois bauen1 bauen1
+>> :chaos.esper.net 311 bauen1 bauen1 ~bauen1 ip5f5ac4ea.dynamic.kabel-deutschland.de * :realname
+>> :chaos.esper.net 319 bauen1 bauen1 :#V #oc
+>> :chaos.esper.net 312 bauen1 bauen1 chaos.esper.net :We're all mad here. (Dallas, TX)
+>> :chaos.esper.net 317 bauen1 bauen1 84 1459693051 :seconds idle, signon time
+>> :chaos.esper.net 330 bauen1 bauen1 bauen1 :is logged in as
+>> :chaos.esper.net 318 bauen1 bauen1 :End of /WHOIS list.
+<< whois RepairMan RepairMan
+>> :webchat.esper.net 311 bauen1 RepairMan webchat ip5f5ac4ea.dynamic.kabel-deutschland.de * :http://webchat.esper.net/
+>> :webchat.esper.net 319 bauen1 RepairMan :#V
+>> :webchat.esper.net 312 bauen1 RepairMan webchat.esper.net :http://webchat.esper.net
+>> :webchat.esper.net 317 bauen1 RepairMan 51 1459712873 :seconds idle, signon time
+>> :webchat.esper.net 318 bauen1 RepairMan :End of /WHOIS list.
+
+
+]]
+
+        self:respond (channel, "Nope.")
+      else
+        command.func (prefix, channel, table.concat (tokens, " "))
+      end
     else
-      command.func (prefix, channel, table.unpack (args, 2))
+      self:respond (channel, "Not found")
     end
   end
 end
@@ -120,8 +152,8 @@ function core:addCommand (name, func, adminonly)
 end
 
 function core:respond (channel, msg)
-  msg = utils.sanitize (msg)
-  self.irc:privmsg (channel, msg or "nil passed as message to respond!")
+  msg = utils.sanitize (msg or "nil passed as message to respond!")
+  self.irc:privmsg (channel, msg)
 end
 
 function core:raw (...)

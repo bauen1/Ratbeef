@@ -1,6 +1,6 @@
 local core = require ("core")
 
-local function reload (prefix, channel, ...)
+local function reload (prefix, channel, suffix)
   core:respond (channel, "Reloading now!")
   core.irc:away ("Reloading modules")
   core:unloadmodules ()

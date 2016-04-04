@@ -1,12 +1,9 @@
 local core = require ("core")
 
 local function reload (prefix, channel, suffix)
-  core:respond (channel, "Reloading now!")
-  core.irc:away ("Reloading modules")
-  core:unloadmodules ()
-  core:loadmodules ()
-  core.irc:away ("")
-  core:respond (channel, "Reload Finished")
+  core:respond (channel, "Will be back in a few secs (full reload)")
+  core:disconnect ("reload")
+  core.reload = true
 end
 
 core:addCommand ("reload", reload, true)

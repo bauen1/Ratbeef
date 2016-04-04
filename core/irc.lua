@@ -84,15 +84,18 @@ function irc:join (channel)
 end
 
 function irc:quit (reason)
-  self:send ("QUIT :%s", reason)
+  self:send ("QUIT :%s", reason or "quit")
 end
 
 function irc:privmsg (target, message)
   self:send ("PRIVMSG %s :%s", target, message)
 end
 
+function irc:action (target, message)
+  self:send ("PRIVMSG %s :\1ACTION %s\1", target, message)
+end
+
 function irc:say (channel, message) return self:privmsg (channel, message) end
-function irc:action (channel, message) return self:privmsg (channel, "ACTION " .. message) end
 
 function irc:msg (...) return self:privmsg (...) end -- Alias for irc:privmsg
 

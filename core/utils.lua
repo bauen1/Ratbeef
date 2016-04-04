@@ -76,6 +76,10 @@ function utils.split (a)
   return ret
 end
 
+function utils.getNick (prefix)
+  return prefix:match ("^:([^!]*)!")
+end
+
 function utils.sanitize (s)
   return string.gsub (s or "", "\a", "BELL")
 end

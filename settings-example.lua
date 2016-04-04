@@ -11,6 +11,12 @@ return {
   ["admins"] = {
     "bauen1"
   },
+  ["trusted"] = {
+    "MrRatermat",
+    "vifino",
+    "ds84182",
+    "bauen1"
+  },
   ["channels"] = {"#V"},
   ["blacklistChannels"] = {"#oc"}, -- Dont spam #oc
   ["blacklistAcc"] = {"ping"}

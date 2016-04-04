@@ -65,34 +65,25 @@ function core:on_privmsg (prefix, args, suffix)
 
   local prefixLen = string.len (self.settings.prefix)
 
-  print (string.sub (suffix, 1, prefixLen) == self.settings.prefix)
   if string.sub (suffix, 1, prefixLen) == self.settings.prefix then
     suffix = string.sub (suffix, prefixLen+1, -1)
     local tokens = utils.split (suffix)
-    print (tokens[1], tokens[2], tokens[3])
     local command = self.commands [table.remove (tokens, 1)]
     if command then
       if command.adminonly then
---[[
+        local nick = utils.getNick (prefix)
 
-<< whois bauen1 bauen1
->> :chaos.esper.net 311 bauen1 bauen1 ~bauen1 ip5f5ac4ea.dynamic.kabel-deutschland.de * :realname
->> :chaos.esper.net 319 bauen1 bauen1 :#V #oc
->> :chaos.esper.net 312 bauen1 bauen1 chaos.esper.net :We're all mad here. (Dallas, TX)
->> :chaos.esper.net 317 bauen1 bauen1 84 1459693051 :seconds idle, signon time
->> :chaos.esper.net 330 bauen1 bauen1 bauen1 :is logged in as
->> :chaos.esper.net 318 bauen1 bauen1 :End of /WHOIS list.
-<< whois RepairMan RepairMan
->> :webchat.esper.net 311 bauen1 RepairMan webchat ip5f5ac4ea.dynamic.kabel-deutschland.de * :http://webchat.esper.net/
->> :webchat.esper.net 319 bauen1 RepairMan :#V
->> :webchat.esper.net 312 bauen1 RepairMan webchat.esper.net :http://webchat.esper.net
->> :webchat.esper.net 317 bauen1 RepairMan 51 1459712873 :seconds idle, signon time
->> :webchat.esper.net 318 bauen1 RepairMan :End of /WHOIS list.
+        local authed = false
 
+        for k,v in pairs (self.settings.admins) do
+          if v == nick then authed = true break end
+        end
 
-]]
-
-        self:respond (channel, "Nope.")
+        if authed then
+          command.func (prefix, channel, table.concat (tokens, " "))
+        else
+          self:respond (channel, "Nope.")
+        end
       else
         command.func (prefix, channel, table.concat (tokens, " "))
       end
@@ -102,8 +93,8 @@ function core:on_privmsg (prefix, args, suffix)
   end
 end
 
-function core:disconnect ()
-  self.irc:quit ()
+function core:disconnect (reason)
+  self.irc:quit (reason)
   self.irc:close ()
 end
 
@@ -139,6 +130,9 @@ end
 function core:start ()
   -- Start listening for messages
   self.irc:start ()
+  if self.reload then
+    return false
+  end
 end
 
 function core:addCommand (name, func, adminonly)

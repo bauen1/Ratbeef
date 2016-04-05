@@ -113,6 +113,10 @@ end
 
 function core:unloadmodules ()
   package.path = self.oldpath or package.path
+  for _, v in pairs (modules) do
+    package.loaded[modules] = nil
+  end
+
   self.modules = {}
   self.commands = {}
   print ("Modules unloaded")
@@ -130,9 +134,6 @@ end
 function core:start ()
   -- Start listening for messages
   self.irc:start ()
-  if self.reload then
-    return false
-  end
 end
 
 function core:addCommand (name, func, adminonly)
@@ -148,6 +149,10 @@ end
 function core:respond (channel, msg)
   msg = utils.sanitize (msg or "nil passed as message to respond!")
   self.irc:privmsg (channel, msg)
+end
+
+function core:action (channel, msg)
+  self.irc:action (channel, msg or "nil")
 end
 
 function core:raw (...)

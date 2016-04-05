@@ -12,3 +12,7 @@ end
 core:addCommand ("hate", hate, true)
 core:addCommand ("like", like, true)
 core:addCommand ("love", love, true)
+
+core:addCommand ("info", function (prefix, channel, suffix)
+  core:respond (channel, "Info command called, dunno what to add here - bauen1")
+end)

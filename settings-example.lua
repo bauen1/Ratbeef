@@ -20,5 +20,6 @@ return {
   ["channels"] = {"#V"},
   ["blacklistChannels"] = {"#oc"}, -- Dont spam #oc
   ["blacklistAcc"] = {"ping"}
-  ["prefix"] = "Ratbeef:"
+  ["prefix"] = "Ratbeef:",
+  ["output_prefix"] = "Ratbot: "
 }

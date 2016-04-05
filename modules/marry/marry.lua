@@ -4,7 +4,9 @@ local utils = require ("utils")
 local function marry (prefix, channel, suffix)
   local target = utils.split (suffix)[1] or "me"
 
-  if (target == "me") or (target == "me!") then
+  target = target:gsub ("!$","")
+
+  if target == "me" then
     target = utils.getNick (prefix) or prefix
   end
 

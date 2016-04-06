@@ -2,7 +2,7 @@ local core = require ("core")
 local utils = require ("utils")
 
 local function marry (prefix, channel, suffix)
-  local target = utils.split (suffix)[1] or "me"
+  local target = utils.split (suffix)[1] or "Ratbot"
 
   target = target:gsub ("!$","")
 

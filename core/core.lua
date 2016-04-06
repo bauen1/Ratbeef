@@ -29,14 +29,7 @@ function core:listener (prefix, cmd, args, suffix)
   if cmd == "PRIVMSG" then
     self:on_privmsg (prefix, args, suffix)
   elseif cmd == "INVITE" then
-    --[[if args[1] and args[2] then
-      local me = args[1]
-      local channel = args[2]
-      local caller = prefix
-
-      self.irc:join (channel)
-      self.irc:privmsg (channel, "Here I am, '"..prefix.."' called me!")
-    end]]
+    -- This is not a whore bot
   elseif cmd == "KICK" then
     local channel = args[1]
     local nickname = args[2]
@@ -53,15 +46,6 @@ end
 
 function core:on_privmsg (prefix, args, suffix)
   local channel = table.remove (args, 1)
-  --[[local msgtargettype = "user"
-
-  -- No more args
-  if string.find (msgtarget, "!") then
-    msgtargettype = "user"
-  else
-    msgtargettype = "channel"
-    msgtarget = "#" .. msgtarget
-  end]]
 
   local prefixLen = string.len (self.settings.prefix)
 
@@ -114,7 +98,8 @@ end
 function core:unloadmodules ()
   package.path = self.oldpath or package.path
   for _, v in pairs (modules) do
-    package.loaded[modules] = nil
+    print (string.format ("Module unloaded %s", tostring (v)))
+    package.loaded[tostring (modules)] = nil
   end
 
   self.modules = {}

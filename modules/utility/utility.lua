@@ -1,4 +1,6 @@
 local core = require "core"
+local utils = require "utils"
+local socket = require "socket"
 
 local function hate (prefix, channel, suffix)
 end

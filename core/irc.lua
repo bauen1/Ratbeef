@@ -45,7 +45,7 @@ function irc:listen ()
   local line, err = self.socket:receive ("*l")
 
   if line then
-    print (string.format ("\027[32m<<\027[00m %s", line))
+    utils.log (string.format ("\027[32m<<\027[00m %s", line))
     local prefix, cmd, args, suffix = utils.parse (line)
     if cmd == "PING" then
       self:send (line:gsub ("PING", "PONG"))
@@ -73,7 +73,7 @@ end
 
 function irc:send (str, ...)
   local s = string.format (tostring (str), ...)
-  print (string.format ("\027[31m>>\027[00m %s", s))
+  utils.log (string.format ("\027[31m>>\027[00m %s", s))
   pcall (assert, str:len (str) <= 512, "Warning, sended message exceeds the limit of 512 chars!")
   socket.sleep (0.1) -- So we dont totaly spam and waste cpu
   return self.socket:send (s .. "\n")

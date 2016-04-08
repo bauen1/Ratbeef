@@ -84,8 +84,8 @@ function utils.sanitize (s)
   return string.gsub (s or "", "\a", "BELL")
 end
 
-function utils.printf (...)
-  return print (string.format (...))
+function utils.log (...)
+  return print (...)
 end
 
 return utils

@@ -17,4 +17,10 @@ local function eval_lua (prefix, channel, suffix)
   end
 end
 
-core:addCommand ("lua", eval_lua, true)
+core:addCommand ("eval", eval_lua, true)
+
+local function lua_sandboxed (prefix, channel, suffix)
+  core:respond (channel, "TODO: implement!")
+end
+
+core:addCommand ("lua", lua_sandboxed, true)

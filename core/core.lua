@@ -77,6 +77,21 @@ function core:on_privmsg (prefix, args, suffix)
   end
 end
 
+function core:invoke_cmd (cmdname, prefix, cmd_arg, ...)
+  local command = self.commands [cmdname]
+
+  if not command then
+    return false, "Command not found"
+  end
+
+  if command.adminonly then
+
+
+  else
+    command.func (prefix, channel)
+  end
+end
+
 function core:disconnect (reason)
   self.irc:quit (reason)
   self.irc:close ()

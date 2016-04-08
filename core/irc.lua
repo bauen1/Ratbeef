@@ -13,7 +13,7 @@ function irc:connect (host, port, nickname, username, ssl)
   local port = port or 6667
 
   local s = socket.tcp ()
-  s:settimeout (30)
+  s:settimeout (1)
   assert (s:connect (host,port))
 
   if ssl then

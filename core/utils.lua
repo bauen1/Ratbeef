@@ -6,7 +6,7 @@ function utils.class ()
   setmetatable (c, {
     __call = function (cl, ...)
       local obj = {}
-      setmetatable(obj,c)
+      setmetatable(obj, cl)
       if cl.new then
         cl.new (obj, ...)
       end

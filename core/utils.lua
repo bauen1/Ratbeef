@@ -84,8 +84,8 @@ function utils.sanitize (s)
   return string.gsub (s or "", "\a", "BELL")
 end
 
-function utils.log (...)
-  return print (...)
+function utils.log (start, ...)
+  return print (os.date("[%H:%M:%S] ") .. start, ...)
 end
 
 return utils

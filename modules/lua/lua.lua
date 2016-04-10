@@ -10,7 +10,7 @@ local function eval_lua (prefix, channel, suffix)
     local ret = table.pack (pcall (f, utils.getNick (prefix), channel, suffix))
 
     if not ret[1] then
-      core:respond (channel, ret[2])
+      core:respond (channel, ret[2] or "nil")
     else
       core:respond (channel, table.concat (ret, "   ", 2))
     end

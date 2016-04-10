@@ -64,7 +64,8 @@ function core:on_privmsg (prefix, args, suffix)
         end
 
         if authed then
-          command.func (prefix, channel, table.concat (tokens, " "))
+          self:respond (channel, "Disabled for security reasons.")
+          --command.func (prefix, channel, table.concat (tokens, " "))
         else
           self:respond (channel, "Nope.")
         end
@@ -77,6 +78,7 @@ function core:on_privmsg (prefix, args, suffix)
   end
 end
 
+--[[
 function core:invoke_cmd (cmdname, prefix, cmd_arg, ...)
   local command = self.commands [cmdname]
 
@@ -91,6 +93,7 @@ function core:invoke_cmd (cmdname, prefix, cmd_arg, ...)
     command.func (prefix, channel)
   end
 end
+]]
 
 function core:disconnect (reason)
   self.irc:quit (reason)

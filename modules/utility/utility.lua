@@ -10,6 +10,15 @@ core:addCommand ("source", function (prefix, channel, suffix)
   core:respond (channel, "I'm available at https://github.com/bauen1/Ratbeef")
 end)
 
+core:addCommand ("list", function (prefix, channel, suffix)
+  local cmd_list = {}
+
+  for k,v in pairs (core.commands) do
+    table.insert (cmd_list, k)
+  end
+  core:respond (channel, "Command List: " .. table.concat (cmd_list, ", "))
+end)
+
 --[[
 core:addCommand ("repeat", function (prefix, channel, suffix)
   local nick = utils.getNick (prefix)

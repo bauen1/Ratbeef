@@ -52,6 +52,7 @@ function core:on_privmsg (prefix, args, suffix)
   if string.sub (suffix, 1, prefixLen) == self.settings.prefix then
     suffix = string.sub (suffix, prefixLen+1, -1)
     local tokens = utils.split (suffix)
+    local cmd_name = tokens[1];
     local command = self.commands [table.remove (tokens, 1)]
     if command then
       if command.adminonly then
@@ -64,7 +65,11 @@ function core:on_privmsg (prefix, args, suffix)
         end
 
         if authed then
-          self:respond (channel, "Disabled for security reasons.")
+          if cmd_name == "die" then
+            command.func (prefix, channel, table.concat (tokens, " "))
+          else
+            self:respond (channel, "Disabled for security reasons.")
+          end
           --command.func (prefix, channel, table.concat (tokens, " "))
         else
           self:respond (channel, "Nope.")

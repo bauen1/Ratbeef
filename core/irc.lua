@@ -82,7 +82,7 @@ end
 function irc:raw (...) return self:send (...) end -- Alias for irc:send
 
 function irc:join (channel)
-  self:send ("JOIN :%s", channel)
+  self:send ("JOIN %s", channel)
 end
 
 function irc:quit (reason)

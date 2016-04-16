@@ -3,26 +3,11 @@
 -- Most awsome hack in the history of lua
 -- TODO: This might be replaced by a lua script for more "cross platform combability" :P
 
-local cmdname = os.tmpname ()
 local stdin_name = os.tmpname ()
 
-print ("cmdname: '" .. cmdname .. "'")
 print ("stdin_name: '" .. stdin_name .. "'")
 
-local cmd = io.open (cmdname, "w")
---cmd:write ("while true; do read inline; echo $inline done")
-cmd:write ([[
-local a = io.open ("]]..stdin_name..[[","w")
-while true do
-  local inline = io.read("L")
-  a:write (inline)
-  a:flush ()
-end
-]])
-cmd:flush ()
-cmd:close ()
-
-cmd = io.popen ("lua " .. cmdname, "r")
+cmd = io.popen ("lua ./read.lua " .. stdin_name, "r")
 _G.stdin = io.open (stdin_name, "r")
 local oldstdin = io.input ()
 local oldread = io.read
@@ -38,8 +23,7 @@ local cleanup_table = setmetatable ({}, {__gc=function()
   print (pcall (stdin.close, stdin))
   print (pcall (os.remove, stdin_name))
   print ("Closing async stdin listener:")
-  --print (pcall (cmd.close, cmd))
-  print (pcall (os.remove, cmdname))
+  print (pcall (cmd.close, cmd))
 end})
 
 

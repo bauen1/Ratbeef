@@ -1,4 +1,5 @@
 local utils = require ("utils")
+local socket = require "socket"
 local irc = require ("irc")
 local parser = require ("parser")
 
@@ -12,6 +13,8 @@ function core:new ()
   self.settings = require ("settings")
 
   -- TODO: Check settings for errors (nil values)
+  assert (self.settings.server, "No server set in settings.lua")
+  assert (self.settings.nickname, "No Nickname set in settings.lua")
 end
 
 function core:connect ()
@@ -130,7 +133,7 @@ function core:unloadmodules ()
   print ("Modules unloaded")
 end
 
-function core:loadmodule (name) -- TODO: pcall everything
+function core:loadmodule (name)
   local ret = table.pack (pcall (require, name))
   if ret[1] then
     return ret[2] or nil
@@ -140,8 +143,31 @@ function core:loadmodule (name) -- TODO: pcall everything
 end
 
 function core:start ()
-  -- Start listening for messages
-  self.irc:start ()
+  -- Listen for incomming messages
+  repeat
+    self.irc:listen ()
+    local inline = io.read ()
+    if inline then
+      print ("> " .. inline)
+      local f,r = load (inline, "=(Console)","t",_G)
+      if f then
+        local ret = table.pack (pcall (f, self))
+
+        if #ret == 1 then
+          table.insert (ret, "nil")
+        end
+
+        if ret[1] then
+          print ("> " .. table.concat (ret, " ", 2))
+        else
+          print ("> " .. tostring (ret[2] or "nil"))
+        end
+      else
+        print ("> " .. tostring (r or "nil"))
+      end
+    end
+    socket.sleep (0.01) -- TODO: Make this multithreaded
+  until (self.irc.state == "not connected")
 end
 
 function core:addCommand (name, func, adminonly)

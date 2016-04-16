@@ -67,6 +67,21 @@ end
 function irc:start ()
   repeat
     self:listen ()
+    local inline = io.read ()
+    if inline then
+      print ("> " .. inline)
+      local f,r = load (inline, "=(Console)","t",_G)
+      if f then
+        local ret = table.pack (pcall (f, self))
+        if ret[1] then
+          print ("> " .. table.concat (ret, " ", 2))
+        else
+          print ("> " .. ret[2])
+        end
+      else
+        print ("> " .. r)
+      end
+    end
     socket.sleep (0.01) -- TODO: Make this multithreaded
   until (self.state == "not connected")
 end

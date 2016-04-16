@@ -1,5 +1,47 @@
 -- This file is full of hacky s**t
--- TODO: Overwrite print to show the date
+
+-- Most awsome hack in the history of lua
+-- TODO: This might be replaced by a lua script for more "cross platform combability" :P
+
+local cmdname = os.tmpname ()
+local stdin_name = os.tmpname ()
+
+print ("cmdname: '" .. cmdname .. "'")
+print ("stdin_name: '" .. stdin_name .. "'")
+
+local cmd = io.open (cmdname, "w")
+--cmd:write ("while true; do read inline; echo $inline done")
+cmd:write ([[
+local a = io.open ("]]..stdin_name..[[","w")
+while true do
+  local inline = io.read("L")
+  a:write (inline)
+  a:flush ()
+end
+]])
+cmd:flush ()
+cmd:close ()
+
+cmd = io.popen ("lua " .. cmdname .. " > " .. stdin_name, "r")
+_G.stdin = io.open (stdin_name, "r")
+local oldstdin = io.input ()
+local oldread = io.read
+_G.io.read = function (...)
+  return stdin:read (...)
+end
+_G.input = function ()
+  return stdin
+end
+local cleanup_table = setmetatable ({}, {__gc=function()
+  print ("Closing async stdin listener:")
+  print (pcall (cmd.close, cmd))
+  print ("Closing stdin file:")
+  print (pcall (stdin.close, stdin))
+  print ("Cleaning the mess up:")
+  print (pcall (os.remove, cmdname))
+  print (pcall (os.remove, stdin_name))
+end})
+
 
 local utils = require ("core.utils")
 _G.class = utils.class -- Unclean way Nr.1

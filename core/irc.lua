@@ -73,13 +73,18 @@ function irc:start ()
       local f,r = load (inline, "=(Console)","t",_G)
       if f then
         local ret = table.pack (pcall (f, self))
+
+        if #ret == 1 then
+          table.insert (ret, "nil")
+        end
+
         if ret[1] then
           print ("> " .. table.concat (ret, " ", 2))
         else
-          print ("> " .. ret[2])
+          print ("> " .. tostring (ret[2] or "nil"))
         end
       else
-        print ("> " .. r)
+        print ("> " .. tostring (r or "nil"))
       end
     end
     socket.sleep (0.01) -- TODO: Make this multithreaded

@@ -22,7 +22,7 @@ end
 cmd:flush ()
 cmd:close ()
 
-cmd = io.popen ("lua " .. cmdname .. " > " .. stdin_name, "r")
+cmd = io.popen ("lua " .. cmdname, "r")
 _G.stdin = io.open (stdin_name, "r")
 local oldstdin = io.input ()
 local oldread = io.read
@@ -32,14 +32,14 @@ end
 _G.input = function ()
   return stdin
 end
+
 local cleanup_table = setmetatable ({}, {__gc=function()
-  print ("Closing async stdin listener:")
-  print (pcall (cmd.close, cmd))
   print ("Closing stdin file:")
   print (pcall (stdin.close, stdin))
-  print ("Cleaning the mess up:")
-  print (pcall (os.remove, cmdname))
   print (pcall (os.remove, stdin_name))
+  print ("Closing async stdin listener:")
+  --print (pcall (cmd.close, cmd))
+  print (pcall (os.remove, cmdname))
 end})
 
 
